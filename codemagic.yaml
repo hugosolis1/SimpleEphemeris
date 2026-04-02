@@ -28,7 +28,8 @@ workflows:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            ENABLE_BITCODE=NO
+            ENABLE_BITCODE=NO \
+            2>&1 | tee build.log
       
       - name: Create IPA
         script: |
@@ -38,4 +39,5 @@ workflows:
           mv SimpleEphemeris_unsigned.ipa ../
     
     artifacts:
+      - build.log
       - build/SimpleEphemeris_unsigned.ipa

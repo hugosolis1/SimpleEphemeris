@@ -33,9 +33,12 @@ workflows:
       
       - name: Create IPA
         script: |
+          ls -la build/Build/Products/Release-iphoneos/ || echo "Build directory not found"
           mkdir -p build/ipa/Payload
-          cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/
-          cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/
+          cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/ 2>&1 || echo "Copy failed"
+          ls -la build/ipa/Payload/ || echo "Payload empty"
+          cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/ 2>&1 || echo "Zip failed"
+          ls -la SimpleEphemeris_unsigned.ipa || echo "IPA not created"
           mv SimpleEphemeris_unsigned.ipa ../
     
     artifacts:

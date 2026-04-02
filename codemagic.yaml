@@ -30,16 +30,32 @@ workflows:
             CODE_SIGNING_ALLOWED=NO \
             ENABLE_BITCODE=NO \
             2>&1 | tee build.log
+          
+          echo "=== Checking build output ==="
+          ls -laR build/Build/Products/ 2>/dev/null || echo "No Products directory"
       
       - name: Create IPA
         script: |
-          ls -la build/Build/Products/Release-iphoneos/ || echo "Build directory not found"
-          mkdir -p build/ipa/Payload
-          cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/ 2>&1 || echo "Copy failed"
-          ls -la build/ipa/Payload/ || echo "Payload empty"
-          cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/ 2>&1 || echo "Zip failed"
-          ls -la SimpleEphemeris_unsigned.ipa || echo "IPA not created"
-          mv SimpleEphemeris_unsigned.ipa ../
+          echo "=== Build Products ==="
+          find build -name "*.app" -type d 2>/dev/null || echo "No .app found"
+          echo "=== Build Products end ==="
+          
+          if [ -d "build/Build/Products/Release-iphoneos/SimpleEphemeris.app" ]; then
+            mkdir -p build/ipa/Payload
+            cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/
+            cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/
+            mv SimpleEphemeris_unsigned.ipa ../
+          elif [ -d "build/Build/Products/Release-iphoneos/SimpleEphemeris.app" ]; then
+            mkdir -p build/ipa/Payload
+            cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/
+            cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/
+            mv SimpleEphemeris_unsigned.ipa ../
+          else
+            echo "ERROR: SimpleEphemeris.app not found!"
+            ls -laR build/
+          fi
+          
+          ls -la build/SimpleEphemeris_unsigned.ipa 2>/dev/null || echo "IPA not created"
     
     artifacts:
       - build.log

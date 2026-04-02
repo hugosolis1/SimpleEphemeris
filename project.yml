@@ -1,0 +1,40 @@
+name: SimpleEphemeris
+options:
+  bundleIdPrefix: com.simpleephemeris
+  deploymentTarget:
+    iOS: "15.8.2"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+
+targets:
+  SimpleEphemeris:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.8.2"
+    sources:
+      - path: Sources/SimpleEphemeris
+        excludes:
+          - "**/*.xcassets/**"
+      - path: Vendor/swisseph
+        type: file
+        includes:
+          - "*.c"
+          - "*.h"
+    resources:
+      - path: Resources/ephe
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.simpleephemeris.app
+        INFOPLIST_FILE: Sources/SimpleEphemeris/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/SimpleEphemeris/SimpleEphemeris-Bridging-Header.h
+        HEADER_SEARCH_PATHS: $(SRCROOT)/Vendor/swisseph $(SRCROOT)/Sources/SimpleEphemeris
+        OTHER_LDFLAGS: -lm
+        GCC_PREPROCESSOR_DEFINITIONS: SWE_DPFMT='"f"' NO_MAIN NDEBUG
+        CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES: YES
+        ALWAYS_SEARCH_USER_PATHS: NO
+    info:
+      path: Sources/SimpleEphemeris/Info.plist

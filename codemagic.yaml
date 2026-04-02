@@ -1,0 +1,41 @@
+workflows:
+  ios-build:
+    name: iOS Build
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    
+    environment:
+      xcode: latest
+      cocoapods: default
+    
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen || true
+      
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+      
+      - name: Build unsigned IPA
+        script: |
+          xcodebuild clean build \
+            -project SimpleEphemeris.xcodeproj \
+            -scheme SimpleEphemeris \
+            -sdk iphoneos \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ENABLE_BITCODE=NO
+      
+      - name: Create IPA
+        script: |
+          mkdir -p build/ipa/Payload
+          cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/
+          cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/
+          mv SimpleEphemeris_unsigned.ipa ../
+    
+    artifacts:
+      - build/SimpleEphemeris_unsigned.ipa

@@ -29,6 +29,7 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             ENABLE_BITCODE=NO \
+            -derivedDataPath build \
             2>&1 | tee build.log
           
           echo "=== Checking build output ==="
@@ -44,15 +45,11 @@ workflows:
             mkdir -p build/ipa/Payload
             cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/
             cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/
-            mv SimpleEphemeris_unsigned.ipa ../
-          elif [ -d "build/Build/Products/Release-iphoneos/SimpleEphemeris.app" ]; then
-            mkdir -p build/ipa/Payload
-            cp -r build/Build/Products/Release-iphoneos/SimpleEphemeris.app build/ipa/Payload/
-            cd build/ipa && zip -r SimpleEphemeris_unsigned.ipa Payload/
-            mv SimpleEphemeris_unsigned.ipa ../
+            mv SimpleEphemeris_unsigned.ipa ../ || echo "Move failed"
           else
             echo "ERROR: SimpleEphemeris.app not found!"
             ls -laR build/
+            exit 1
           fi
           
           ls -la build/SimpleEphemeris_unsigned.ipa 2>/dev/null || echo "IPA not created"
